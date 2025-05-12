@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Controlled Blynk</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 15px;
+}
+
+h1 {
+  margin-bottom: 25px;
+  font-size: 28px;
+  color: #333;
+  text-align: center;
+}
+
+.section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  margin: 20px 0;
+  width: 100%;
+  max-width: 400px;
+  transition: all 0.3s ease-in-out;
+}
+
+.section:hover {
+  transform: translateY(-4px);
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #444;
+  font-size: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.toggle-btn,
+.voice-btn {
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.toggle-btn.on {
+  background: linear-gradient(to right, #43e97b, #38f9d7);
+  color: #fff;
+}
+
+.toggle-btn.off {
+  background: linear-gradient(to right, #f85032, #e73827);
+  color: #fff;
+}
+
+.toggle-btn:hover {
+  transform: scale(1.03);
+}
+
+.voice-btn {
+  background: linear-gradient(to right, #2193b0, #6dd5ed);
+  color: #fff;
+  max-width: 360px;
+  margin-bottom: 25px;
+}
+
+.voice-btn:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
+
+.voice-display {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f0f8ff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Responsive tweaks for small devices */
+@media (max-width: 500px) {
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .section {
+    padding: 18px;
+    margin: 15px 0;
+    border-radius: 12px;
+  }
+
+  .toggle-btn,
+  .voice-btn {
+    font-size: 15px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .section {
+    max-width: 100%;
+  }
+
+  .toggle-btn,
+  .voice-btn {
+    font-size: 14px;
+    padding: 9px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+}
+
+</style>
+
+</head>
+<body>
+
+  <h1>🔊 Voice Controlled Blynk Panel</h1>
+
+  <button id="startVoice" class="voice-btn">🎤 Start Voice Command</button>
+  <div id="voiceOutput" class="voice-display">You said: ...</div>
+
+
+ <!-- App 1 Section -->
+<div class="section">
+  <h2>Smart Home (App 1)</h2>
+  <button id="app1_btn1" class="toggle-btn off" onclick="toggle('app1', 1)">Relay 1: OFF</button>
+  <button id="app1_btn2" class="toggle-btn off" onclick="toggle('app1', 2)">Relay 2: OFF</button>
+  <button id="app1_btn3" class="toggle-btn off" onclick="toggle('app1', 3)">Bedroom Light: OFF</button>
+  <button id="app1_btn4" class="toggle-btn off" onclick="toggle('app1', 4)">Fan: OFF</button>
+</div>
+
+<!-- App 2 Section -->
+<div class="section">
+  <h2>SmartPlug 2 (App 2)</h2>
+  <button id="app2_btn1" class="toggle-btn off" onclick="toggle('app2', 1)">Relay 1: OFF</button>
+  <button id="app2_btn2" class="toggle-btn off" onclick="toggle('app2', 2)">Motor: OFF</button>
+  <button id="app2_btn3" class="toggle-btn off" onclick="toggle('app2', 3)">Relay 3: OFF</button>
+  <button id="app2_btn4" class="toggle-btn off" onclick="toggle('app2', 4)">Mic: OFF</button>
+</div>
+
+<!-- App 3 Section -->
+<div class="section">
+  <h2>SmartPlug (App 3)</h2>
+  <button id="app3_btn1" class="toggle-btn off" onclick="toggle('app3', 1)">Iphone: OFF</button>
+  <button id="app3_btn2" class="toggle-btn off" onclick="toggle('app3', 2)">Infinix: OFF</button>
+  <button id="app3_btn3" class="toggle-btn off" onclick="toggle('app3', 3)">HeadPhone: OFF</button>
+  <button id="app3_btn4" class="toggle-btn off" onclick="toggle('app3', 4)">Laptop: OFF</button>
+</div>
+
+  <script>
+    const apps = {
+  app1: {
+    token: "lhELh2hu1ouKuDoziYjxdzlrgSHrkGlg",
+    states: { 1: 0, 2: 0, 3: 0, 4: 0 }
+  },
+  app2: {
+    token: "B3zGySOexKemlM6Sj_FV4w1Cw3PYPGi2",
+    states: { 1: 0, 2: 0, 3: 0, 4: 0 }
+  },
+ app3: {
+    token: "grCUresk7BXfnMLh7CQAHNoWYqr4yOPE",
+    states: { 1: 0, 2: 0, 3: 0, 4: 0 }
+  }
+};
+
+const labelMap = {
+  app1: {
+    1: "Relay 1",
+    2: "Relay 2",
+    3: "Bedroom Light",
+    4: "Fan"
+  },
+  app2: {
+    1: "Relay 1",
+    2: "Motor",
+    3: "Relay 3",
+    4: "Mic"
+  },
+ app3: {
+    1: "Iphone",
+    2: "Infinix",
+    3: "HeadPhone",
+    4: "Laptop"
+  }
+};
+
+function toggle(appName, pin, forceValue = null) {
+  const app = apps[appName];
+  if (forceValue !== null) {
+    app.states[pin] = forceValue;
+  } else {
+    app.states[pin] = app.states[pin] === 0 ? 1 : 0;
+  }
+
+  const url = `https://blynk.cloud/external/api/update?token=${app.token}&V${pin}=${app.states[pin]}`;
+  fetch(url)
+    .then(response => {
+      if (response.ok) {
+        const btn = document.getElementById(`${appName}_btn${pin}`);
+        const label = labelMap[appName][pin];
+        btn.textContent = `${label}: ${app.states[pin] ? 'ON' : 'OFF'}`;
+        btn.className = `toggle-btn ${app.states[pin] ? 'on' : 'off'}`;
+      } else {
+        alert("Failed to update Blynk.");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("Network error.");
+    });
+}
+
+
+
+let micStream = null;
+
+function setupVoiceRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Your browser does not support Speech Recognition.");
+    return;
+  }
+
+  if (micStream) {
+    startRecognition(); // পুরানো stream থাকলে সরাসরি চালু করো
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    micStream = stream; // store the stream
+    startRecognition(); // এবার স্টার্ট করো
+  }).catch(err => {
+    alert("Microphone access denied: " + err.message);
+  });
+}
+
+function startRecognition() {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = 'en-US';
+  recognition.continuous = true;
+  recognition.interimResults = false;
+
+  recognition.onresult = function(event) {
+    const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+    console.log("Voice command:", command);
+    document.getElementById("voiceOutput").textContent = "You said: " + command;
+
+ // Voice command mapping
+        if (command.includes("light on")) toggle("app1", 3, 1);
+
+        else if (command.includes("light off")) toggle("app1", 3, 0);
+        else if (command.includes("light of")) toggle("app1", 3, 0);
+        else if (command.includes("light up")) toggle("app1", 3, 0);
+          
+        else if (command.includes("hen on")) toggle("app1", 4, 1);
+        else if (command.includes("pen on")) toggle("app1", 4, 1);
+        else if (command.includes("fan on")) toggle("app1", 4, 1);
+        else if (command.includes("fan one")) toggle("app1", 4, 1);
+        else if (command.includes("hand on")) toggle("app1", 4, 1);
+
+        else if (command.includes("hen off")) toggle("app1", 4, 0);
+        else if (command.includes("pen off")) toggle("app1", 4, 0);
+        else if (command.includes("fan off")) toggle("app1", 4, 0);
+        else if (command.includes("fan up")) toggle("app1", 4, 0);
+        else if (command.includes("fan of")) toggle("app1", 4, 0);
+        else if (command.includes("hand of")) toggle("app1", 4, 0);
+        else if (command.includes("hang up")) toggle("app1", 4, 0);
+        else if (command.includes("pan off")) toggle("app1", 4, 0);
+
+        else if (command.includes("motor on")) toggle("app2", 2, 1);
+        else if (command.includes("motor off")) toggle("app2", 2, 0);
+        else if (command.includes("motor of")) toggle("app2", 2, 0);
+
+        else if (command.includes("mic on")) toggle("app2", 4, 1);
+        else if (command.includes("mic of")) toggle("app2", 4, 0);
+        else if (command.includes("mic off")) toggle("app2", 4, 0);
+
+    
+    };
+
+
+  recognition.onerror = function(event) {
+    console.error("Speech Recognition Error:", event.error);
+  };
+
+  recognition.onend = function() {
+    console.log("Speech ended. Restarting...");
+    recognition.start(); // 🔁 আবার চালু
+  };
+
+  recognition.start();
+
+  document.getElementById("startVoice").disabled = true;
+  document.getElementById("startVoice").textContent = "🎤 Voice Active";
+}
+
+// ✅ প্রথমবার ক্লিক করার জন্য event listener
+document.getElementById("startVoice").addEventListener("click", setupVoiceRecognition);
+
+
+function initializeStates() {
+  for (const appName in apps) {
+    const app = apps[appName];
+    for (let pin = 1; pin <= 4; pin++) {
+      const url = `https://blynk.cloud/external/api/get?token=${app.token}&V${pin}`;
+      fetch(url)
+        .then(response => response.text())
+        .then(value => {
+          const state = parseInt(value);
+          app.states[pin] = state;
+          const btn = document.getElementById(`${appName}_btn${pin}`);
+          const label = labelMap[appName][pin];
+          if (btn) {
+            btn.textContent = `${label}: ${state ? 'ON' : 'OFF'}`;
+            btn.className = `toggle-btn ${state ? 'on' : 'off'}`;
+          }
+        })
+        .catch(error => {
+          console.error(`Error fetching state for ${appName} pin ${pin}:`, error);
+        });
+    }
+  }
+}
+
+// প্রতি 0.3 সেকেন্ডে স্টেট আপডেট করবে
+setInterval(initializeStates, 300);
+
+// প্রথমবার পেইজ লোড হলে কল করবে
+window.onload = initializeStates;
+
+</script>
+
+</body>
+</html>
