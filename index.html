@@ -174,14 +174,63 @@ h2 {
 
 <!-- App 3 Section -->
 <div class="section">
-  <h2>SmartPlug (App 3)</h2>
-  <button id="app3_btn1" class="toggle-btn off" onclick="toggle('app3', 1)">Iphone: OFF</button>
-  <button id="app3_btn2" class="toggle-btn off" onclick="toggle('app3', 2)">Infinix: OFF</button>
-  <button id="app3_btn3" class="toggle-btn off" onclick="toggle('app3', 3)">HeadPhone: OFF</button>
-  <button id="app3_btn4" class="toggle-btn off" onclick="toggle('app3', 4)">Laptop: OFF</button>
+  <h2>SmartLocal (App 3)</h2>
+  <button id="app3_btn0" class="toggle-btn off" onclick="toggleLocal(0)">Relay 1: OFF</button>
+  <button id="app3_btn1" class="toggle-btn off" onclick="toggleLocal(1)">Relay 2: OFF</button>
+  <button id="app3_btn2" class="toggle-btn off" onclick="toggleLocal(2)">Relay 3: OFF</button>
+  <button id="app3_btn3" class="toggle-btn off" onclick="toggleLocal(3)">Relay 4: OFF</button>
 </div>
 
+
   <script>
+
+const app3States = [0, 0, 0, 0]; // Initial OFF states
+
+function toggleLocal(relay, forceValue = null) {
+  if (forceValue !== null) {
+    app3States[relay] = forceValue;
+  } else {
+    app3States[relay] = app3States[relay] === 0 ? 1 : 0;
+  }
+
+  const url = `http://192.168.1.184/toggle?relay=${relay}`;
+  fetch(url)
+    .then(response => {
+      if (!response.ok) throw new Error("Toggle failed");
+      setTimeout(updateApp3StatesFromDevice, 300); // Wait a bit, then refresh state
+    })
+    .catch(error => {
+      console.error("App 3 Toggle Error:", error);
+      alert("App 3: Network error.");
+    });
+}
+
+
+function updateApp3StatesFromDevice() {
+  fetch('http://192.168.1.184/get_status')
+    .then(response => response.json())
+    .then(data => {
+      const states = data.relays; // Example: [true, true, false, false]
+      for (let relay = 0; relay < 4; relay++) {
+        app3States[relay] = states[relay] ? 1 : 0;
+        const btn = document.getElementById(`app3_btn${relay}`);
+        if (btn) {
+          btn.textContent = `Relay ${relay + 1}: ${states[relay] ? 'ON' : 'OFF'}`;
+          btn.className = `toggle-btn ${states[relay] ? 'on' : 'off'}`;
+        }
+      }
+    })
+    .catch(error => {
+      console.error("App 3 Status Error:", error);
+    });
+}
+
+setInterval(updateApp3StatesFromDevice, 1000);
+
+
+
+
+
     const apps = {
   app1: {
     token: "lhELh2hu1ouKuDoziYjxdzlrgSHrkGlg",
@@ -189,10 +238,6 @@ h2 {
   },
   app2: {
     token: "B3zGySOexKemlM6Sj_FV4w1Cw3PYPGi2",
-    states: { 1: 0, 2: 0, 3: 0, 4: 0 }
-  },
- app3: {
-    token: "grCUresk7BXfnMLh7CQAHNoWYqr4yOPE",
     states: { 1: 0, 2: 0, 3: 0, 4: 0 }
   }
 };
@@ -209,12 +254,6 @@ const labelMap = {
     2: "Motor",
     3: "Relay 3",
     4: "Mic"
-  },
- app3: {
-    1: "Iphone",
-    2: "Infinix",
-    3: "HeadPhone",
-    4: "Laptop"
   }
 };
 
@@ -279,9 +318,10 @@ function startRecognition() {
     console.log("Voice command:", command);
     document.getElementById("voiceOutput").textContent = "You said: " + command;
 
- // Voice command mapping
+   // Voice command mapping
         if (command.includes("light on")) toggle("app1", 3, 1);
 
+      
         else if (command.includes("light off")) toggle("app1", 3, 0);
         else if (command.includes("light of")) toggle("app1", 3, 0);
         else if (command.includes("light up")) toggle("app1", 3, 0);
@@ -309,9 +349,121 @@ function startRecognition() {
         else if (command.includes("mic of")) toggle("app2", 4, 0);
         else if (command.includes("mic off")) toggle("app2", 4, 0);
 
-    
-    };
 
+
+
+// 🔊 Voice command for App 3 (local relay using IP API)
+else if (command.includes("device one start")) {
+  app3States[0] = 1;
+  toggleLocal(0);
+}
+else if (command.includes("device on")) {
+  app3States[0] = 1;
+  toggleLocal(0);
+}
+else if (command.includes("device on starch")) {
+  app3States[0] = 1;
+  toggleLocal(0);
+}
+else if (command.includes("device on start")) {
+  app3States[0] = 1;
+  toggleLocal(0);
+}
+
+
+else if (command.includes("device one stop")) {
+  app3States[0] = 0;
+  toggleLocal(0);
+}
+else if (command.includes("device on stop")) {
+  app3States[0] = 0;
+  toggleLocal(0);
+}
+
+
+else if (command.includes("device two start")) {
+  app3States[1] = 1;
+  toggleLocal(1);
+}
+else if (command.includes("device to")) {
+  app3States[1] = 1;
+  toggleLocal(1);
+}
+else if (command.includes("device to start")) {
+  app3States[1] = 1;
+  toggleLocal(1);
+}
+
+
+else if (command.includes("device two stop")) {
+  app3States[1] = 0;
+  toggleLocal(1);
+}
+
+else if (command.includes("device to stop")) {
+  app3States[1] = 0;
+  toggleLocal(1);
+}
+
+
+else if (command.includes("device three start")) {
+  app3States[2] = 1;
+  toggleLocal(2);
+}
+else if (command.includes("device 3")) {
+  app3States[2] = 1;
+  toggleLocal(2);
+}
+else if (command.includes("device 3 start")) {
+  app3States[2] = 1;
+  toggleLocal(2);
+}
+
+
+else if (command.includes("device three stop")) {
+  app3States[2] = 0;
+  toggleLocal(2);
+}
+else if (command.includes("device 3 stop")) {
+  app3States[2] = 0;
+  toggleLocal(2);
+}
+else if (command.includes("device 3 stock")) {
+  app3States[2] = 0;
+  toggleLocal(2);
+}
+
+
+
+else if (command.includes("device four start")) {
+  app3States[3] = 1;
+  toggleLocal(3);
+}
+else if (command.includes("device for")) {
+  app3States[3] = 1;
+  toggleLocal(3);
+}
+else if (command.includes("device for start")) {
+  app3States[3] = 1;
+  toggleLocal(3);
+}
+
+
+else if (command.includes("device four stop")) {
+  app3States[3] = 0;
+  toggleLocal(3);
+}
+else if (command.includes("device for stop")) {
+  app3States[3] = 0;
+  toggleLocal(3);
+}
+else if (command.includes("device for stock")) {
+  app3States[3] = 0;
+  toggleLocal(3);
+}
+       
+        else alert("Sorry, command not recognized.");
+    };
 
   recognition.onerror = function(event) {
     console.error("Speech Recognition Error:", event.error);
@@ -330,7 +482,6 @@ function startRecognition() {
 
 // ✅ প্রথমবার ক্লিক করার জন্য event listener
 document.getElementById("startVoice").addEventListener("click", setupVoiceRecognition);
-
 
 function initializeStates() {
   for (const appName in apps) {
@@ -360,7 +511,11 @@ function initializeStates() {
 setInterval(initializeStates, 300);
 
 // প্রথমবার পেইজ লোড হলে কল করবে
-window.onload = initializeStates;
+window.onload = function () {
+  initializeStates();       // Blynk Apps
+  updateApp3StatesFromDevice(); // Local App 3
+};
+
 
 </script>
 
